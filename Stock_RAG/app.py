@@ -4,9 +4,7 @@ Free stack: HuggingFace embeddings + ChromaDB + Groq (Llama 3)
 """
 from pathlib import Path
 from ingest import ingest
-import os
 import streamlit as st
-from pathlib import Path
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_groq import ChatGroq
@@ -14,7 +12,8 @@ from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 
 # ── Config ────────────────────────────────────────────────────────────────────
-CHROMA_DIR = "chroma_db"
+BASE_DIR = Path(__file__).parent
+CHROMA_DIR = BASE_DIR / "chroma_db"
 TOP_K = 3
 
 PROMPT_TEMPLATE = """You are a stock research analyst assistant.
@@ -85,7 +84,7 @@ with st.sidebar:
     st.markdown("**Stack**")
     st.markdown("- Embeddings: `all-MiniLM-L6-v2`")
     st.markdown("- Vector DB: ChromaDB (local)")
-    st.markdown("- LLM: `llama3-8b-8192` via Groq")
+    st.markdown("- LLM: `llama-3.1-8b-instant` via Groq")
     st.markdown("- Retrieval: top-3 chunks")
     st.markdown("- Cost: **$0.00**")
 
@@ -97,7 +96,7 @@ if not groq_key:
 @st.cache_resource(show_spinner="Loading vector store…")
 def load_vectorstore():
 
-    if not Path(CHROMA_DIR).exists():
+    if not CHROMA_DIR.exists():
         with st.spinner("Building vector database for first run..."):
             ingest()
 
@@ -107,7 +106,7 @@ def load_vectorstore():
     )
 
     return Chroma(
-        persist_directory=CHROMA_DIR,
+        persist_directory=str(CHROMA_DIR),
         embedding_function=embeddings,
     )
 
@@ -132,10 +131,14 @@ def build_chain(_vectorstore, api_key: str):
 
 
 vectorstore = load_vectorstore()
+
+st.write("Current folder:", Path.cwd())
+st.write("Chroma path:", CHROMA_DIR)
+st.write("Chroma exists:", CHROMA_DIR.exists())
+
 collection = vectorstore._collection
 n_chunks = collection.count()
 st.write("Collection Count:", n_chunks)
-st.metric("Chunks indexed", n_chunks)
 
 st.divider()
 
