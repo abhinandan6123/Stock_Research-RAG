@@ -94,7 +94,7 @@ Streamlit Interface
 
 ## Architecture
 
-<img src="images/rag-architecture.png" width="700" alt="RAG Architecture"/>
+<img src="rag-architecture.png" width="700" alt="RAG Architecture"/>
 
 
 ## Technical Decisions
