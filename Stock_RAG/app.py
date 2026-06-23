@@ -114,10 +114,10 @@ def load_vectorstore():
 @st.cache_resource(show_spinner=False)
 def build_chain(_vectorstore, api_key: str):
     llm = ChatGroq(
-        model="llama3-8b-8192",
-        temperature=0,
-        groq_api_key=api_key,
-    )
+    model="llama-3.1-8b-instant",
+    temperature=0,
+    groq_api_key=api_key,
+)
     prompt = PromptTemplate(
         template=PROMPT_TEMPLATE,
         input_variables=["context", "question"],
