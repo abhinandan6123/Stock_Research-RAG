@@ -1,160 +1,209 @@
-# Stock_Research-RAG
-Cost-efficient RAG system for stock research using markdown knowledge bases, semantic search, ChromaDB, local embeddings, and Streamlit deployment.
+# Stock Research RAG
+
+A production-style Retrieval-Augmented Generation (RAG) application for stock research, built using local embeddings, ChromaDB vector search, and Groq-hosted Llama 3.1. The system enables natural-language querying across structured investment research notes while maintaining source transparency, low latency, and near-zero operating cost.
 
 ---
 
-## Interface
+## Live Demo
 
-![Stock Research RAG UI](assets/demo.png)
+**Application:** https://stockresearch-rag-aa3daeunai9qeqtpwihgjv.streamlit.app/
 
-### Features
-- 🔍 **Semantic search** across 8 stock research notes
-- 💬 **Natural language queries** — ask like you're talking to an analyst
-- 📄 **Source transparency** — see exactly which notes were used to answer
-- ⚡ **Fast retrieval** — Groq's Llama 3 responds in under 2 seconds
-- 💰 **Zero cost** — local embeddings + free Groq API
+**GitHub Repository:** https://github.com/abhinandan6123/Stock_Research-RAG
 
 ---
 
-## Architecture
+## Overview
 
-```
-Markdown Files (data/)
-        ↓
-   Chunking (500 tokens, 50 overlap)
-        ↓
-   Embeddings (all-MiniLM-L6-v2, local)
-        ↓
-   ChromaDB (local vector store)
-        ↓
-   Retriever (top-3 chunks)
-        ↓
-   LLM (Llama 3 8B via Groq — free)
-        ↓
-   Streamlit UI
-```
+This project demonstrates a cost-efficient RAG pipeline for financial research.
+
+Instead of relying on expensive hosted vector databases or paid embedding APIs, the application uses:
+
+* Local sentence-transformer embeddings
+* ChromaDB for persistent vector storage
+* Groq-hosted Llama 3.1 for low-latency inference
+* Markdown-based knowledge management
+* Streamlit for rapid deployment
+
+The result is a lightweight stock research assistant capable of answering questions grounded in curated research notes.
 
 ---
 
-## Why These Choices
+## Key Features
 
-| Decision | Choice | Reason |
-|----------|--------|--------|
-| Embeddings | `all-MiniLM-L6-v2` | Free, runs locally, good semantic accuracy |
-| Vector DB | ChromaDB | No external service, persists to disk |
-| LLM | Llama 3 8B (Groq) | Free API, fast (300 tok/s), no cost |
-| Chunk size | 500 tokens | Enough context per chunk, avoids large context windows |
-| Top-K | 3 | Sufficient retrieval, minimal token usage |
-| Splitter | `RecursiveCharacterTextSplitter` | Respects markdown headers → semantic chunks |
+### Semantic Search
 
-**Cost per query: $0.00**
+Search across research documents using vector similarity rather than keyword matching.
 
----
+### Retrieval-Augmented Generation
 
-## Setup
+Relevant context is retrieved before generation, reducing hallucinations and improving factual accuracy.
 
-### 1. Clone the repo
-```bash
-git clone https://github.com/abhi6123/stock-research-rag.git
-cd stock-research-rag
-```
+### Source Attribution
 
-### 2. Install dependencies
-```bash
-pip install -r requirements.txt
-```
+Every answer includes the supporting documents used during retrieval.
 
-### 3. Get a free Groq API key
-Go to [console.groq.com](https://console.groq.com) → Create account → API Keys → Create key
+### Cost-Efficient Architecture
 
-### 4. Build the vector store (run once)
-```bash
-python ingest.py
-```
+Uses local embeddings and a free Groq inference endpoint to minimize operational costs.
 
-### 5. Run the app
-```bash
-streamlit run app.py
-```
+### Extensible Knowledge Base
 
-Open `http://localhost:8501` — enter your Groq API key in the sidebar and start querying.
+New research notes can be added simply by dropping markdown files into the data directory.
 
 ---
 
-## Docker
+## System Architecture
 
-```bash
-docker build -t stock-rag .
-docker run -p 8501:8501 stock-rag
+```text
+Research Notes (.md)
+        │
+        ▼
+Recursive Chunking
+(500 chars, 50 overlap)
+        │
+        ▼
+Embeddings
+(all-MiniLM-L6-v2)
+        │
+        ▼
+ChromaDB
+(Vector Store)
+        │
+        ▼
+Top-K Retrieval
+(k = 3)
+        │
+        ▼
+Groq Llama 3.1 8B Instant
+        │
+        ▼
+Streamlit Interface
 ```
+
+### Retrieval Flow
+
+1. User submits a question.
+2. Query is converted into an embedding.
+3. ChromaDB retrieves the most relevant chunks.
+4. Retrieved context is injected into the prompt.
+5. Llama 3.1 generates a grounded response.
+6. Supporting sources are displayed.
 
 ---
 
-## Deploy to Streamlit Cloud (Free)
+## Technical Decisions
 
-1. Push this repo to GitHub
-2. Go to [share.streamlit.io](https://share.streamlit.io)
-3. Connect your repo → set `app.py` as entry point
-4. Add secret: `GROQ_API_KEY = gsk_...` (optional, or enter at runtime)
-5. Deploy → get a public URL
+| Component       | Technology                     | Rationale                                      |
+| --------------- | ------------------------------ | ---------------------------------------------- |
+| Embeddings      | all-MiniLM-L6-v2               | Lightweight, free, strong semantic performance |
+| Vector Database | ChromaDB                       | Persistent local vector storage                |
+| LLM             | Llama 3.1 8B Instant (Groq)    | Fast inference with no infrastructure overhead |
+| Chunking        | RecursiveCharacterTextSplitter | Preserves semantic structure                   |
+| Retrieval       | Top-K = 3                      | Balances accuracy and token efficiency         |
+| Frontend        | Streamlit                      | Rapid deployment and demonstration             |
 
 ---
 
 ## Knowledge Base
 
-8 research notes in `data/`:
+The system currently indexes eight research notes covering major AI infrastructure and semiconductor companies:
 
-| File | Coverage |
-|------|----------|
-| `nvidia.md` | NVDA business, bottlenecks, Blackwell, financials |
-| `tsmc.md` | Foundry role, CoWoS constraint, geopolitical risk |
-| `amd.md` | MI300X, ROCm gap, supply chain |
-| `broadcom.md` | Custom ASICs, hyperscaler XPUs, VMware |
-| `asml.md` | EUV monopoly, export controls, pricing |
-| `microsoft.md` | Azure AI, OpenAI partnership, Copilot |
-| `ai_capex_trends.md` | $200B hyperscaler spend, beneficiary layers |
-| `supply_chain_risks.md` | HBM shortage, packaging, power, geopolitics |
-
-To add more notes: drop any `.md` file into `data/` and re-run `python ingest.py`.
+| Company / Topic    | Coverage                                  |
+| ------------------ | ----------------------------------------- |
+| NVIDIA             | Competitive moat, Blackwell, AI ecosystem |
+| TSMC               | Foundry dominance, CoWoS bottlenecks      |
+| AMD                | MI300X, GPU competition                   |
+| Broadcom           | Custom ASIC strategy                      |
+| ASML               | EUV monopoly and supply chain leverage    |
+| Microsoft          | Azure AI and OpenAI ecosystem             |
+| AI CapEx Trends    | Infrastructure spending trends            |
+| Supply Chain Risks | Semiconductor bottlenecks and constraints |
 
 ---
 
 ## Sample Questions
 
-- AI supply chain bottlenecks
-- What is NVIDIA's competitive moat?
-- Which stocks benefit from AI capex spending?
-- How does TSMC impact AI chip supply?
-- What are the risks in the semiconductor sector?
-- What is Broadcom's custom ASIC business?
+* What is NVIDIA's competitive moat?
+* Which companies benefit most from AI infrastructure spending?
+* How does TSMC influence AI chip supply?
+* What are the major semiconductor supply chain bottlenecks?
+* What role does ASML play in the AI ecosystem?
+* What is Broadcom's custom ASIC business?
 
 ---
 
-## Project Structure
+## Installation
 
+### Clone Repository
+
+```bash
+git clone https://github.com/abhinandan6123/Stock_Research-RAG.git
+cd Stock_Research-RAG
 ```
-stock-research-rag/
-├── app.py                  ← Streamlit UI
-├── ingest.py               ← Build vector store (run once)
-├── requirements.txt
-├── Dockerfile
-├── README.md
-└── data/                   ← Obsidian-style markdown knowledge base
-    ├── nvidia.md
-    ├── tsmc.md
-    ├── amd.md
-    ├── broadcom.md
-    ├── asml.md
-    ├── microsoft.md
-    ├── ai_capex_trends.md
-    └── supply_chain_risks.md
+
+### Install Dependencies
+
+```bash
+pip install -r requirements.txt
 ```
+
+### Launch Application
+
+```bash
+streamlit run app.py
+```
+
+### Configure API Key
+
+Create a free API key from:
+
+https://console.groq.com
+
+Enter the key in the Streamlit sidebar when prompted.
 
 ---
 
-## Built By
+## Deployment
 
-**Venkata Abhinandan Kancharla** — AI Engineer
+The application is deployed using Streamlit Community Cloud.
 
-[![Portfolio](https://img.shields.io/badge/Portfolio-abhikancharla.vercel.app-blue?style=flat&logo=vercel)](https://abhikancharla.vercel.app/)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-abhi6123-0077B5?style=flat&logo=linkedin)](https://www.linkedin.com/in/abhi6123)
+Deployment steps:
+
+1. Push repository to GitHub
+2. Connect repository to Streamlit Cloud
+3. Set app entry point
+4. Deploy
+
+The vector database is automatically generated during first launch if not already present.
+
+---
+
+## Future Improvements
+
+* Hybrid retrieval (BM25 + Vector Search)
+* Reranking pipeline
+* Portfolio analysis mode
+* Earnings call ingestion
+* PDF research ingestion
+* Multi-document citation support
+* Agentic research workflows
+
+---
+
+## Author
+
+**Venkata Abhinandan Kancharla**
+
+AI & Machine Learning Engineer
+
+Portfolio: https://abhikancharla.vercel.app
+
+GitHub: https://github.com/abhinandan6123
+
+LinkedIn: https://www.linkedin.com/in/abhikancharla
+
+---
+
+## License
+
+This project is released under the MIT License.
