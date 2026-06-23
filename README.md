@@ -6,7 +6,7 @@ A production-style Retrieval-Augmented Generation (RAG) application for stock re
 
 ## Live Demo
 
-**Application:** https://stockresearch-rag-aa3daeunai9qeqtpwihgjv.streamlit.app/
+**Application:** [https://stockresearch-rag-aa3daeunai9qeqtpwihgjv.streamlit.app/](https://stockresearch-rag-sefmb2fz2pxo4jybfoptnz.streamlit.app/#sources-used)
 
 **GitHub Repository:** https://github.com/abhinandan6123/Stock_Research-RAG
 
