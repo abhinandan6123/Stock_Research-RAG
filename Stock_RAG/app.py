@@ -2,7 +2,8 @@
 app.py  —  Stock Research RAG
 Free stack: HuggingFace embeddings + ChromaDB + Groq (Llama 3)
 """
-
+from pathlib import Path
+from ingest import ingest
 import os
 import streamlit as st
 from pathlib import Path
@@ -95,20 +96,20 @@ if not groq_key:
 # ── Load ChromaDB ─────────────────────────────────────────────────────────────
 @st.cache_resource(show_spinner="Loading vector store…")
 def load_vectorstore():
+
     if not Path(CHROMA_DIR).exists():
-        st.error(
-            "Vector store not found. Run `python ingest.py` first to build it."
-        )
-        st.stop()
+        with st.spinner("Building vector database for first run..."):
+            ingest()
+
     embeddings = HuggingFaceEmbeddings(
         model_name="all-MiniLM-L6-v2",
         model_kwargs={"device": "cpu"},
     )
+
     return Chroma(
         persist_directory=CHROMA_DIR,
         embedding_function=embeddings,
     )
-
 
 @st.cache_resource(show_spinner=False)
 def build_chain(_vectorstore, api_key: str):
