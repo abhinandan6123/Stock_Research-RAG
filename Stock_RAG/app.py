@@ -67,7 +67,7 @@ st.markdown(
     '<p class="meta">Knowledge base: Obsidian-style markdown · '
     'Embeddings: all-MiniLM-L6-v2 (free) · '
     'Vector DB: ChromaDB · '
-    'LLM: Llama 3 via Groq (free)</p>',
+    'LLM: Llama 3.1 via Groq (free)</p>',
     unsafe_allow_html=True,
 )
 
@@ -134,6 +134,7 @@ def build_chain(_vectorstore, api_key: str):
 vectorstore = load_vectorstore()
 collection = vectorstore._collection
 n_chunks = collection.count()
+st.write("Collection Count:", n_chunks)
 st.metric("Chunks indexed", n_chunks)
 
 st.divider()
