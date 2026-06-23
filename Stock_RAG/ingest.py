@@ -6,10 +6,7 @@ Usage: python ingest.py
 
 from pathlib import Path
 
-from langchain_community.document_loaders import (
-    DirectoryLoader,
-    UnstructuredMarkdownLoader,
-)
+from langchain_community.document_loaders import DirectoryLoader, TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
@@ -33,10 +30,11 @@ def ingest():
         )
 
     loader = DirectoryLoader(
-        str(DATA_DIR),
-        glob="**/*.md",
-        loader_cls=UnstructuredMarkdownLoader,
-    )
+    str(DATA_DIR),
+    glob="**/*.md",
+    loader_cls=TextLoader,
+    loader_kwargs={"encoding": "utf-8"},
+)
 
     docs = loader.load()
     print(f"  Loaded {len(docs)} documents")
