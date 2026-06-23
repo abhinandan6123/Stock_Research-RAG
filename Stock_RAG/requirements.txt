@@ -4,5 +4,5 @@ langchain-community==0.2.6
 langchain-groq==0.1.6
 chromadb==0.5.3
 sentence-transformers==3.0.1
-unstructured==0.14.6
+unstructured>=0.18.0
 python-3.11
