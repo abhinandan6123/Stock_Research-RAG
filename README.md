@@ -1,6 +1,6 @@
 # Stock Research RAG
 
-A production-style Retrieval-Augmented Generation (RAG) application for stock research, built using local embeddings, ChromaDB vector search, and Groq-hosted Llama 3.1. The system enables natural-language querying across structured investment research notes while maintaining source transparency, low latency, and near-zero operating cost.
+A Production-Style Retrieval-Augmented Generation (RAG) application for stock research, built using local embeddings, ChromaDB vector search, and Groq-hosted Llama 3.1. The system enables natural-language querying across structured investment research notes while maintaining source transparency, low latency, and near-zero operating cost.
 
 I built a Stock Research RAG application where stock research notes are converted into embeddings and stored in ChromaDB. When a user asks a question, the system retrieves the most relevant chunks using semantic search and provides them to Llama 3.1 through Groq to generate grounded answers with source references. This improves accuracy, reduces hallucinations, and keeps costs low using local embeddings and efficient retrieval.
 ---
